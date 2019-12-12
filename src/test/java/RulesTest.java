@@ -211,6 +211,24 @@ public class RulesTest {
         assertEquals(int[].class, rules.get(6).getType());
         assertEquals(int.class, rules.get(6).getGenericTypes()[0]);
     }
+
+    static class WebReq10A {
+        String name;
+        List<WebReq10B> a;
+    }
+
+    static class WebReq10B {
+        String code;
+    }
+
+    @Test
+    void 리스트() {
+        Rules rules = Rules.of(WebReq10A.class);
+        assertEquals("/a->/a", rules.get(0).toString());
+        assertEquals("/a/code->/a/code", rules.get(1).toString());
+        assertEquals(String.class, rules.get(1).getGenericTypes()[0]);
+        assertEquals("/name->/name", rules.get(1).toString());
+    }
 }
 
 

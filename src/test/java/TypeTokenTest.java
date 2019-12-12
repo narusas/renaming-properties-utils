@@ -6,8 +6,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TypeTokenTest {
 
@@ -39,6 +40,21 @@ public class TypeTokenTest {
         assertEquals("int[]", aClass.getDeclaredField("a").getGenericType().getTypeName());
         assertEquals("java.util.List[]", aClass.getDeclaredField("b").getGenericType().getTypeName());
         assertEquals("java.lang.Integer[]", aClass.getDeclaredField("c").getGenericType().getTypeName());
+    }
+
+    @Test
+    void assignable() {
+        assertTrue(Collection.class.isAssignableFrom(ArrayList.class));
+        assertTrue(Collection.class.isAssignableFrom(List.class));
+        assertTrue(Collection.class.isAssignableFrom(Set.class));
+        assertTrue(Collection.class.isAssignableFrom(HashSet.class));
+        assertTrue(Collection.class.isAssignableFrom(Vector.class));
+
+        assertFalse(Collection.class.isAssignableFrom(HashMap.class), "컬렉션 기본 타입이 Collection/Map 이며 서로는 호환되지 않음");
+
+        assertTrue(Map.class.isAssignableFrom(HashMap.class));
+        assertTrue(Map.class.isAssignableFrom(Hashtable.class));
+        assertTrue(Map.class.isAssignableFrom(ConcurrentHashMap.class));
     }
 }
 

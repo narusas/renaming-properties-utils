@@ -1,4 +1,5 @@
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -74,6 +75,8 @@ class RulesFactory {
 
             if (isBasicType()) {
                 rules.add(new Rule(parentRule, ruleClass, field, parentPath, field.getName(), currentRenamePath, rename));
+            } else if (collectionType()) {
+//                handleCollection();
             } else {
                 if (isFlatten == false) {
                     nextParentRule = new Rule(parentRule, ruleClass, field, parentPath, field.getName(), currentRenamePath, rename);
@@ -84,9 +87,29 @@ class RulesFactory {
             }
         }
 
+
+        private boolean collectionType() {
+            return Collection.class.isAssignableFrom(field.getType()) || Map.class.isAssignableFrom(field.getType()) || field.getType().isArray();
+        }
+
+        private void handleCollection() {
+            new CollectionParser().process();
+        }
+
+        class CollectionParser {
+
+            public void process() {
+                nextParentRule = new Rule(parentRule, ruleClass, field, parentPath, field.getName(), currentRenamePath, rename);
+                rules.add(nextParentRule);
+                adjustFlatRenamePath();
+                parse(nextParentRule, currentPath, currentRenamePath, (Class) nextParentRule.getGenericTypes()[0], rules);
+            }
+        }
+
+
         private void adjustFlatRenamePath() {
             currentRenamePath = currentRenamePath + rename + "/";
-            if (currentRenamePath.startsWith("//")){
+            if (currentRenamePath.startsWith("//")) {
                 currentRenamePath = currentRenamePath.substring(1);
             }
         }
@@ -136,6 +159,7 @@ class RulesFactory {
         }
 
     }
+
 
 
 }
