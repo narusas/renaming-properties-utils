@@ -116,4 +116,9 @@ class Rule {
             throw new IllegalArgumentException(ex);
         }
     }
+
+
+    public Rule splitRename(String path) {
+        return new  Rule(parentRule, ruleClass, field, parentPath, name, renamePath.substring(path.length()+1), rename) ;
+    }
 }

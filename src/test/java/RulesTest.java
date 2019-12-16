@@ -32,7 +32,7 @@ public class RulesTest {
     }
 
     @Test
-    void rename() {
+    void simpleRename() {
         Rules rules = Rules.of(WebReq2.class);
         assertEquals("/name->/name", rules.get(0).toString());
         assertEquals("/phone->/phn", rules.get(1).toString());
@@ -145,7 +145,6 @@ public class RulesTest {
     }
 
 
-
     static class WebReq8A {
         @Rename("nm")
         String name;
@@ -182,28 +181,39 @@ public class RulesTest {
         int b;
         List<String> c;
         Set<String> d;
-        Map<String, Rules> e;
+        Map<String, String> e;
         String[] f;
         int[] g;
 
+    }
+
+    static class WebReq9B {
+        String h;
     }
 
 
     @Test
     void 타입분석_제레릭포함() {
         Rules rules = Rules.of(WebReq9A.class);
+        assertEquals("/a->/a", rules.get(0).toString());
         assertEquals(String.class, rules.get(0).getType());
+
+        assertEquals("/b->/b", rules.get(1).toString());
         assertEquals(int.class, rules.get(1).getType());
 
+        assertEquals("/c->/c", rules.get(2).toString());
         assertEquals(List.class, rules.get(2).getType());
         assertEquals(String.class, rules.get(2).getGenericTypes()[0]);
 
+        assertEquals("/d->/d", rules.get(3).toString());
         assertEquals(Set.class, rules.get(3).getType());
         assertEquals(String.class, rules.get(3).getGenericTypes()[0]);
 
+        assertEquals("/e->/e", rules.get(4).toString());
         assertEquals(Map.class, rules.get(4).getType());
         assertEquals(String.class, rules.get(4).getGenericTypes()[0]);
-        assertEquals(Rules.class, rules.get(4).getGenericTypes()[1]);
+        assertEquals(String.class, rules.get(4).getGenericTypes()[1]);
+
 
         assertEquals(String[].class, rules.get(5).getType());
         assertEquals(String.class, rules.get(5).getGenericTypes()[0]);
@@ -227,7 +237,51 @@ public class RulesTest {
         assertEquals("/a->/a", rules.get(0).toString());
         assertEquals("/a/code->/a/code", rules.get(1).toString());
         assertEquals(String.class, rules.get(1).getGenericTypes()[0]);
-        assertEquals("/name->/name", rules.get(1).toString());
+
+        assertEquals("/name->/name", rules.get(2).toString());
+    }
+
+    static class WebReq11A {
+        String name;
+        Map<String, WebReq11B> a;
+    }
+
+    static class WebReq11B {
+        String code;
+    }
+
+    @Test
+    void 맵() {
+        Rules rules = Rules.of(WebReq11A.class);
+
+        assertEquals("/a->/a", rules.get(0).toString());
+        assertEquals(String.class, rules.get(0).getGenericTypes()[0]);
+        assertEquals(WebReq11B.class, rules.get(0).getGenericTypes()[1]);
+
+        // 맵의 key 까지 복합 객체를 지원하기에는 너무 복잡해져서 일단 베이직 타입만 지원하기로 함
+        // 맵의 키에 대한 description이 필요 없기 때문에 value 에 대한 구조 description만 있으면 됨
+        assertEquals("/a/code->/a/code", rules.get(1).toString());
+
+        assertEquals("/name->/name", rules.get(2).toString());
+    }
+
+    static class WebReq12A {
+        String name;
+        WebReq12B[] a;
+    }
+
+    static class WebReq12B {
+        String code;
+    }
+
+    @Test
+    void 배열() {
+        Rules rules = Rules.of(WebReq12A.class);
+        assertEquals("/a->/a", rules.get(0).toString());
+        assertEquals(WebReq12B.class, rules.get(0).getGenericTypes()[0]);
+        assertEquals("/a/code->/a/code", rules.get(1).toString());
+        assertEquals("/name->/name", rules.get(2).toString());
+
     }
 }
 

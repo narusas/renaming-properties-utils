@@ -76,7 +76,7 @@ class RulesFactory {
             if (isBasicType()) {
                 rules.add(new Rule(parentRule, ruleClass, field, parentPath, field.getName(), currentRenamePath, rename));
             } else if (collectionType()) {
-//                handleCollection();
+                handleCollection();
             } else {
                 if (isFlatten == false) {
                     nextParentRule = new Rule(parentRule, ruleClass, field, parentPath, field.getName(), currentRenamePath, rename);
@@ -89,7 +89,19 @@ class RulesFactory {
 
 
         private boolean collectionType() {
-            return Collection.class.isAssignableFrom(field.getType()) || Map.class.isAssignableFrom(field.getType()) || field.getType().isArray();
+            return isCollectionType() || isMapType() || isArrayType();
+        }
+
+        private boolean isArrayType() {
+            return field.getType().isArray();
+        }
+
+        private boolean isMapType() {
+            return Map.class.isAssignableFrom(field.getType());
+        }
+
+        private boolean isCollectionType() {
+            return Collection.class.isAssignableFrom(field.getType());
         }
 
         private void handleCollection() {
@@ -102,7 +114,36 @@ class RulesFactory {
                 nextParentRule = new Rule(parentRule, ruleClass, field, parentPath, field.getName(), currentRenamePath, rename);
                 rules.add(nextParentRule);
                 adjustFlatRenamePath();
-                parse(nextParentRule, currentPath, currentRenamePath, (Class) nextParentRule.getGenericTypes()[0], rules);
+
+
+                if (isCollectionType()) {
+                    Class nextRuleClass = (Class) nextParentRule.getGenericTypes()[0];
+                    if (isBasicType(nextRuleClass)) {
+                        // basic type의 구조를 분석할 필요는 없음
+                        return;
+                    }
+                    parse(nextParentRule, currentPath, currentRenamePath, nextRuleClass, rules);
+                } else if (isMapType()) {
+                    Class keyClass = (Class) nextParentRule.getGenericTypes()[0];
+
+                    // Map의 경우 key는 basic type이여야 함
+                    if (isBasicType(keyClass) == false) {
+                        throw new IllegalArgumentException(" Type of map's key must be basic type. path=" + currentPath + " keyType:" + keyClass);
+                    }
+                    Class nextRuleClass = (Class) nextParentRule.getGenericTypes()[1];
+                    if (isBasicType(nextRuleClass)) {
+                        // basic type의 구조를 분석할 필요는 없음
+                        return;
+                    }
+                    parse(nextParentRule, currentPath, currentRenamePath, nextRuleClass, rules);
+                } else if (isArrayType()) {
+                    Class nextRuleClass = (Class) nextParentRule.getGenericTypes()[0];
+                    if (isBasicType(nextRuleClass)) {
+                        // basic type의 구조를 분석할 필요는 없음
+                        return;
+                    }
+                    parse(nextParentRule, currentPath, currentRenamePath, nextRuleClass, rules);
+                }
             }
         }
 
@@ -144,22 +185,42 @@ class RulesFactory {
 
         protected boolean isBasicType() {
             Class<?> targetType = field.getType();
-            return Byte.class.equals(targetType)
-                    || Short.class.equals(targetType)
-                    || Integer.class.equals(targetType)
-                    || Long.class.equals(targetType)
+            return isBasicType(targetType);
+        }
 
-                    || Float.class.equals(targetType)
-                    || Double.class.equals(targetType)
-                    || Boolean.class.equals(targetType)
+        protected boolean isBasicType(Class targetType) {
+            return
+                    String.class.equals(targetType)
 
-                    || Character.class.equals(targetType)
+                            || Integer.class.equals(targetType)
+                            || int.class.equals(targetType)
 
-                    || String.class.equals(targetType);
+                            || Boolean.class.equals(targetType)
+                            || boolean.class.equals(targetType)
+
+                            || Long.class.equals(targetType)
+                            || long.class.equals(targetType)
+
+
+                            || Byte.class.equals(targetType)
+                            || byte.class.equals(targetType)
+
+                            || Short.class.equals(targetType)
+                            || short.class.equals(targetType)
+
+                            || Float.class.equals(targetType)
+                            || float.class.equals(targetType)
+
+                            || Double.class.equals(targetType)
+                            || double.class.equals(targetType)
+
+                            || Character.class.equals(targetType)
+                            || char.class.equals(targetType)
+
+                    ;
         }
 
     }
-
 
 
 }
