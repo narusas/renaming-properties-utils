@@ -281,7 +281,7 @@ class LeftToRightConvert<T> {
     }
 
     class WriteCollectionProperty {
-        
+
     }
 
     private void writeCollectionProperty(Object source, T target, Rule rule, Object sourceProperty) {
