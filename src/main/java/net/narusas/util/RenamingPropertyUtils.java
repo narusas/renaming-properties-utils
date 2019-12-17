@@ -11,7 +11,8 @@ public class RenamingPropertyUtils {
      * @return
      */
     public static <T> T from(Object source, Class<T> targetClass) {
-        return (T) new FromConversion(source, targetClass).convert();
+        LeftToRightConvert<T> converter = new LeftToRightConvert<T>(source, targetClass);
+        return converter.doConvert();
     }
 
     /**
@@ -23,8 +24,7 @@ public class RenamingPropertyUtils {
      * @return
      */
     public static <T> T to(Object source, Class<T> targetClass) {
-
-        return (T) new ToConversion(source, targetClass).convert();
+        return null;
     }
 
 

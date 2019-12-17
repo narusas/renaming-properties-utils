@@ -14,7 +14,7 @@ public class RenamingPropertyUtilsFromTest {
 
     @NoArgsConstructor
     @AllArgsConstructor
-    static class WebReq1A {
+    public static class WebReq1A {
         String name;
         String phone;
     }
@@ -22,13 +22,10 @@ public class RenamingPropertyUtilsFromTest {
 
     @NoArgsConstructor
     @AllArgsConstructor
-    static class ServiceReq1A {
+    public static class ServiceReq1A {
         String name;
         String phone;
     }
-
-
-
 
 
     @Test
@@ -41,8 +38,8 @@ public class RenamingPropertyUtilsFromTest {
 
     @NoArgsConstructor
     @AllArgsConstructor
-    static class WebReq2 {
-        @Rename("name")
+    public static class WebReq2 {
+        @Rename("/name")
         String nm;
 
         String phn;
@@ -58,11 +55,11 @@ public class RenamingPropertyUtilsFromTest {
 
     @NoArgsConstructor
     @AllArgsConstructor
-    static class WebReq3 {
-        @Rename("name")
+    public static class WebReq3 {
+        @Rename("/name")
         String nm;
 
-        @Rename( "phone")
+        @Rename("/phone")
         String phn;
     }
 
@@ -77,7 +74,7 @@ public class RenamingPropertyUtilsFromTest {
 
     @NoArgsConstructor
     @AllArgsConstructor
-    static class WebReq4 {
+    public static class WebReq4 {
         String name;
         Integer phone;
     }
@@ -92,10 +89,10 @@ public class RenamingPropertyUtilsFromTest {
 
     @NoArgsConstructor
     @AllArgsConstructor
-    static class WebReqA {
+    public static class WebReqA {
         String name;
 
-        @Rename("c.phone")
+        @Rename("/c/phone")
         String phone;
 
     }
@@ -103,14 +100,14 @@ public class RenamingPropertyUtilsFromTest {
     @NoArgsConstructor
     @AllArgsConstructor
     @ToString
-    static class ServiceReqB {
+    public static class ServiceReqB {
         String name;
         ServiceReqC c;
     }
 
     @NoArgsConstructor
     @ToString
-    static class ServiceReqC {
+    public static class ServiceReqC {
         String phone;
     }
 
@@ -127,10 +124,10 @@ public class RenamingPropertyUtilsFromTest {
 
     @NoArgsConstructor
     @AllArgsConstructor
-    static class WebReqA2 {
+    public static class WebReqA2 {
         String name;
 
-        @Rename("c.d.phone")
+        @Rename("/c/d/phone")
         String phone;
 
     }
@@ -138,20 +135,20 @@ public class RenamingPropertyUtilsFromTest {
     @NoArgsConstructor
     @AllArgsConstructor
     @ToString
-    static class ServiceReqB2 {
+    public static class ServiceReqB2 {
         String name;
         ServiceReqC2 c;
     }
 
     @NoArgsConstructor
     @ToString
-    static class ServiceReqC2 {
+    public static class ServiceReqC2 {
         ServiceReqD2 d;
     }
 
     @NoArgsConstructor
     @ToString
-    static class ServiceReqD2 {
+    public static class ServiceReqD2 {
         String phone;
     }
 
@@ -166,43 +163,42 @@ public class RenamingPropertyUtilsFromTest {
     }
 
     @AllArgsConstructor
-    static class WebReq3A {
+    public static class WebReq3A {
         String name;
 
         WebReq3B b;
     }
 
     @AllArgsConstructor
-    static class WebReq3B {
+    public static class WebReq3B {
 
         String section;
 
         WebReq3C c;
     }
+
     @AllArgsConstructor
-    static class WebReq3C {
+    public static class WebReq3C {
         String code;
     }
 
-    static class ServieReq3A {
+    public static class ServieReq3A {
         String name;
         ServieReq3B b;
     }
 
-    static class ServieReq3B {
+    public static class ServieReq3B {
         String section;
         ServieReq3C c;
     }
 
-    static class ServieReq3C {
+    public static class ServieReq3C {
         String code;
     }
 
 
-
-
     @Test
-    void 복합객체에서_복합객체로(){
+    void 복합객체에서_복합객체로() {
         WebReq3A web = new WebReq3A("John", new WebReq3B("Seoul", new WebReq3C("01233")));
         ServieReq3A service = RenamingPropertyUtils.from(web, ServieReq3A.class);
         assertEquals("John", service.name);

@@ -189,14 +189,56 @@ public class Rule {
             Object holder = fillPaths(targetRoot);
 
             String path = name;
+
             Field field = holder.getClass().getDeclaredField(path);
             field.setAccessible(true);
-            field.set(holder, property);
+            field.set(holder, typeMatch(field.getType(), property));
 
 
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    private Object typeMatch(Class<?> type, Object property) {
+        if (type.equals(property.getClass())) {
+            return property;
+        }
+        if (String.class.equals(type)) {
+            return String.valueOf(property);
+        }
+        if (String.class.equals(property.getClass())) {
+            String strProperty = (String) property;
+            if (Integer.class.equals(type) || int.class.equals(type)) {
+                return Integer.parseInt(strProperty);
+            }
+            if (Boolean.class.equals(type) || boolean.class.equals(type)) {
+                return Boolean.parseBoolean(strProperty);
+            }
+            if (Long.class.equals(type) || long.class.equals(type)) {
+                return Long.parseLong(strProperty);
+            }
+            if (Float.class.equals(type) || float.class.equals(type)) {
+                return Float.parseFloat(strProperty);
+            }
+            if (Byte.class.equals(type) || byte.class.equals(type)) {
+                return Byte.parseByte(strProperty);
+            }
+            if (Short.class.equals(type) || short.class.equals(type)) {
+                return Short.parseShort(strProperty);
+            }
+            if (Double.class.equals(type) || double.class.equals(type)) {
+                return Double.parseDouble(strProperty);
+            }
+            if (Character.class.equals(type) || char.class.equals(type)) {
+                return (strProperty == null || strProperty.length() != 1) ? null : strProperty.charAt(0);
+            }
+            //@TODO BigDecimal BigInteger, AtomicInteger...등등
+
+        }
+
+
+        return property;
     }
 
     protected <T> Object fillPaths(T targetRoot) throws NoSuchFieldException, IllegalAccessException, InstantiationException {

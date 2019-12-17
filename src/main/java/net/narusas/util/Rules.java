@@ -25,12 +25,15 @@ public class Rules extends ArrayList<Rule> {
                 return rule;
             }
         }
-        throw new IllegalArgumentException("Can not found rule for path: " + path);
+        return null;
     }
 
     public <T> void copyTo(Object sourceRoot, T targetRoot, Rules targetRules) {
         for(Rule sourceRule: this) {
             Rule targetRule = targetRules.find(sourceRule.getRenamePath());
+            if (targetRule == null) {
+                continue;
+            }
             sourceRule.copyTo(sourceRoot, targetRoot, targetRule);
         }
     }

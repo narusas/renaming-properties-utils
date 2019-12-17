@@ -1,5 +1,6 @@
 package net.narusas.util;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,12 +22,22 @@ public class LeftToRightConvert<T> {
 
     public T doConvert() {
         try {
-            T targetRoot = targetClass.newInstance();
+            enableSecurity(targetClass);
+            Constructor<?> c = targetClass.getDeclaredConstructors()[0];
+            c.setAccessible(true);
+            T targetRoot = (T)c.newInstance();
             sourceRules.copyTo(sourceRoot, targetRoot, targetRules);
 
             return targetRoot;
         } catch (Exception ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+    private void enableSecurity(Class<T> targetClass) {
+
+        for (Constructor c : targetClass.getDeclaredConstructors()) {
+            c.setAccessible(true);
         }
     }
 
