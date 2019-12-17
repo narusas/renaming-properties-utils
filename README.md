@@ -214,5 +214,26 @@ public class RenamingPropertyUtilsFromTest {
 ## Todo
 * To Copy:  복사 룰이 Right 객체이 있을때 
 * BigDecimal, BigInteger, AtomicInteger등 추가 타입 
+* Array, Map 지원
+* ArrayList 말고 지정된 Collection으로 컬렉션 생성
 * 깊은 중첩 객체의 값을 낮은 곳으로 정리하기 
+* 여러 변수를 하나의 목록으로 변환. (form에서 phone1, phone2, phone3 등 여러 이름으로 받아서 List<String> phone에 넣을수 있는 기능 `@Rename(value="phone", collect=true)` 정도가 될듯)
+* 목록을 복수의 변수명으로 풀기. 위 기능의 반대. `@Rename(value="phone", split=true)`  . phone으로 시작하는 변수명을 정렬하여 순서대로 넣기. 
+* 상대 경로 지원 
+* 기본 설정. List를 arrylist로 만들지 concurrent list로 만들지 등등. 기본 설정을 할수 있게
+* 성능 측정하여 성능 개선. 
+* 캐시 기능에서 클래스가 런타임에 변경되는 경우를 지원하기 위해  weak reference 사용하게.
+* Validation 지원
+* Spring MVC에서 controller에 Web Request class를 지정하고  `@Rule(ServiceReqest.class)` 를 지정하면,   컨버팅 된 객체 바로 받아서 쓸수 있게
+```
+@Rule(value=ServiceRequest.class, field="as")
+public static class WebReq1 {
+    ...
+    ServiceRequest as;
+}
+@RequestMapping
+public void doSometing(WebReq1 req){
+    ServiceRequest serviceReq  = req.as; 
+}
+```
 * .... Too many 
