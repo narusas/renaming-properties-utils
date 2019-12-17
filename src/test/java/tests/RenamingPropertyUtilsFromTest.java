@@ -39,7 +39,7 @@ public class RenamingPropertyUtilsFromTest {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class WebReq2 {
-        @Rename("/name")
+        @Rename("name")
         String nm;
 
         String phn;
@@ -56,10 +56,10 @@ public class RenamingPropertyUtilsFromTest {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class WebReq3 {
-        @Rename("/name")
+        @Rename("name")
         String nm;
 
-        @Rename("/phone")
+        @Rename("phone")
         String phn;
     }
 
@@ -92,7 +92,7 @@ public class RenamingPropertyUtilsFromTest {
     public static class WebReqA {
         String name;
 
-        @Rename("/c/phone")
+        @Rename("c/phone")
         String phone;
 
     }
@@ -127,7 +127,7 @@ public class RenamingPropertyUtilsFromTest {
     public static class WebReqA2 {
         String name;
 
-        @Rename("/c/d/phone")
+        @Rename("c/d/phone")
         String phone;
 
     }
