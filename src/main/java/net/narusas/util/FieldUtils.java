@@ -1,3 +1,5 @@
+package net.narusas.util;
+
 import java.lang.reflect.Field;
 
 public class FieldUtils {

@@ -1,3 +1,5 @@
+package net.narusas.util;
+
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
@@ -21,8 +23,8 @@ class RulesFactory {
         if (useCache && cachesRules.containsKey(ruleClass)) {
             return;
         }
-        Rule rootRule = new Rule();
-        rules = parse(rootRule, "/", "/", ruleClass, new Rules());
+
+        rules = parse(new Rule(), "/", "/", ruleClass, new Rules());
         rules.sort((c1, c2) -> c1.toString().compareTo(c2.toString()));
         if (useCache) {
             cachesRules.put(ruleClass, rules);

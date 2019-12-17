@@ -1,6 +1,10 @@
+package tests;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import net.narusas.util.Rename;
+import net.narusas.util.RenamingPropertyUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

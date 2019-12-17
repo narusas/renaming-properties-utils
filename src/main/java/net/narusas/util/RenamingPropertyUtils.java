@@ -1,8 +1,4 @@
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+package net.narusas.util;
 
 public class RenamingPropertyUtils {
 
