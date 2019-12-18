@@ -8,17 +8,6 @@ public class Rules extends ArrayList<Rule> {
     }
 
 
-    public Rules subRenamePaths(Rule rule) {
-        Rules result = new Rules();
-        for (Rule item : this) {
-            if (item.getRenamePath().startsWith(rule.getRenamePath())) {
-                result.add(item.splitRename(rule.getRenamePath()));
-            }
-        }
-
-        return result;
-    }
-
     public Rule find(String path) {
         for (Rule rule : this) {
             if (rule.getPath().equals(path)) {
@@ -28,13 +17,5 @@ public class Rules extends ArrayList<Rule> {
         return null;
     }
 
-    public <T> void copyTo(Object sourceRoot, T targetRoot, Rules targetRules) {
-        for(Rule sourceRule: this) {
-            Rule targetRule = targetRules.find(sourceRule.getRenamePath());
-            if (targetRule == null) {
-                continue;
-            }
-            sourceRule.copyTo(sourceRoot, targetRoot, targetRule);
-        }
-    }
+
 }

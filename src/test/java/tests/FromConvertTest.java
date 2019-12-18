@@ -2,7 +2,7 @@ package tests;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import net.narusas.util.LeftToRightConvert;
+import net.narusas.util.FromConvert;
 import net.narusas.util.Rename;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +10,8 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ConvertTest {
+
+public class FromConvertTest {
 
     @NoArgsConstructor
     @AllArgsConstructor
@@ -26,7 +27,7 @@ public class ConvertTest {
 
     @Test
     void simple() {
-        LeftToRightConvert<ServiceReq1B> convert = new LeftToRightConvert(new WebReq1A("John"), ServiceReq1B.class);
+        FromConvert<ServiceReq1B> convert = new FromConvert(new WebReq1A("John"), ServiceReq1B.class);
         ServiceReq1B b = convert.doConvert();
         assertEquals("John", b.name);
     }
@@ -47,7 +48,7 @@ public class ConvertTest {
 
     @Test
     void rename() {
-        LeftToRightConvert<ServiceReq2B> convert = new LeftToRightConvert(new WebReq2A("John"), ServiceReq2B.class);
+        FromConvert<ServiceReq2B> convert = new FromConvert(new WebReq2A("John"), ServiceReq2B.class);
         ServiceReq2B b = convert.doConvert();
         assertEquals("John", b.nm);
     }
@@ -82,7 +83,7 @@ public class ConvertTest {
 
     @Test
     void 복합객체() {
-        LeftToRightConvert<ServiceReq3A> convert = new LeftToRightConvert(new WebReq3A("John", new WebReq3B("CD001")), ServiceReq3A.class);
+        FromConvert<ServiceReq3A> convert = new FromConvert(new WebReq3A("John", new WebReq3B("CD001")), ServiceReq3A.class);
         ServiceReq3A b = convert.doConvert();
         assertEquals("John", b.nm);
         assertEquals("CD001", b.b.code);
@@ -114,7 +115,7 @@ public class ConvertTest {
 
     @Test
     void 복합객체_flatten() {
-        LeftToRightConvert<ServiceReq4A> convert = new LeftToRightConvert(new WebReq4A("John", new WebReq4B("CD001")), ServiceReq4A.class);
+        FromConvert<ServiceReq4A> convert = new FromConvert(new WebReq4A("John", new WebReq4B("CD001")), ServiceReq4A.class);
         ServiceReq4A b = convert.doConvert();
         assertEquals("John", b.nm);
         assertEquals("CD001", b.code);
@@ -140,7 +141,7 @@ public class ConvertTest {
 
     @Test
     void ListOfString() {
-        LeftToRightConvert<ServiceReq5A> convert = new LeftToRightConvert(new WebReq5A("John", Arrays.asList("CD001", "CD002")), ServiceReq5A.class);
+        FromConvert<ServiceReq5A> convert = new FromConvert(new WebReq5A("John", Arrays.asList("CD001", "CD002")), ServiceReq5A.class);
         ServiceReq5A b = convert.doConvert();
         assertEquals("John", b.nm);
         assertEquals("CD001", b.cd.get(0));

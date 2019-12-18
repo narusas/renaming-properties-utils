@@ -233,8 +233,10 @@ public class RulesTest {
     void 리스트() {
         Rules rules = Rules.of(WebReq10A.class);
         assertEquals("/a->/a", rules.get(0).toString());
+        assertEquals(List.class, rules.get(0).getType());
+        assertEquals(WebReq10B.class, rules.get(0).getGenericTypes()[0]);
         assertEquals("/a/code->/a/code", rules.get(1).toString());
-        assertEquals(String.class, rules.get(1).getGenericTypes()[0]);
+        assertEquals(String.class, rules.get(1).getType());
 
         assertEquals("/name->/name", rules.get(2).toString());
     }

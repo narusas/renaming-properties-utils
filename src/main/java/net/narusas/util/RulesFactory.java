@@ -76,12 +76,12 @@ class RulesFactory {
             adjustRenamePath();
 
             if (isBasicType()) {
-                rules.add(new Rule(parentRule, ruleClass, field, parentPath, field.getName(), currentRenamePath, rename));
+                rules.add(new Rule( ruleClass, field, parentPath, field.getName(), currentRenamePath, rename));
             } else if (collectionType()) {
                 handleCollection();
             } else {
                 if (isFlatten == false) {
-                    nextParentRule = new Rule(parentRule, ruleClass, field, parentPath, field.getName(), currentRenamePath, rename);
+                    nextParentRule = new Rule(ruleClass, field, parentPath, field.getName(), currentRenamePath, rename);
                     rules.add(nextParentRule);
                 }
                 adjustFlatRenamePath();
@@ -113,7 +113,7 @@ class RulesFactory {
         class CollectionParser {
 
             public void process() {
-                nextParentRule = new Rule(parentRule, ruleClass, field, parentPath, field.getName(), currentRenamePath, rename);
+                nextParentRule = new Rule( ruleClass, field, parentPath, field.getName(), currentRenamePath, rename);
                 rules.add(nextParentRule);
                 adjustFlatRenamePath();
 
