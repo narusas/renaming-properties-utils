@@ -79,7 +79,7 @@ public class RenamingPropertyUtilToTest {
     static class WebResponse4 {
         String name;
 
-        @Rename("b.phone")
+        @Rename("b/phone")
         String phone;
     }
 
@@ -112,7 +112,7 @@ public class RenamingPropertyUtilToTest {
     static class WebResponse5 {
         String name;
 
-        @Rename("b.c.phone")
+        @Rename("b/c/phone")
         String phone;
     }
 

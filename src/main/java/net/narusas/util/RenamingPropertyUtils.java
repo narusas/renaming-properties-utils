@@ -24,7 +24,8 @@ public class RenamingPropertyUtils {
      * @return
      */
     public static <T> T to(Object source, Class<T> targetClass) {
-        return null;
+        ToConvert<T> converter = new ToConvert<>(source, targetClass);
+        return converter.doConvert();
     }
 
 

@@ -3,9 +3,11 @@ package net.narusas.util;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 변환 룰이 target에 있을때 사용하는 컨버터
+ *
  * @param <T>
  */
 public class ToConvert<T> {
@@ -28,34 +30,60 @@ public class ToConvert<T> {
             enableSecurity(targetClass);
             Constructor<?> c = targetClass.getDeclaredConstructors()[0];
             c.setAccessible(true);
-            T targetRoot = (T)c.newInstance();
+            T targetRoot = (T) c.newInstance();
 
-            for(Rule targetRule: targetRules) {
-                if (targetRule.isCollectionType()){
+            String previous = null;
 
-                }
-                else if (TypeSupports.isBasicType(targetRule.getType())){
+            /**
+             * 컬렉션 내용물은 별도의 컨버팅을 하기 때문에 컬렉션의 이름으로 시작하는 베이직 속성을 무시하면 됨
+             * rule은 정렬 되어 있고 다른 문자열로 시작하는 것이 나오기 전까지만 비교하면 됨
+             */
+            for (Rule targetRule : targetRules) {
 
-                }
-                else {
+                if (targetRule.isCollectionType()) {
+                    previous = targetRule.getPath();
+                    copyCollection(source, sourceRules, targetRoot, targetRule);
+                } else if (TypeSupports.isBasicType(targetRule.getType()) == false) {
+                    // 객체는 basci property에서 채워짐
+                } else {
+                    if (previous != null && targetRule.getPath().startsWith(previous)) {
+                        continue;
+                    }
                     copyBasic(source, sourceRules, targetRoot, targetRule);
                 }
             }
-
             return targetRoot;
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    private void copyBasic(Object sourceRoot, Rules sourceRules, T targetRoot, Rule targetRule) {
-        System.out.println(targetRule);
+    private void copyCollection(Object sourceRoot, Rules sourceRules, T targetRoot, Rule targetRule) {
         Rule sourceRule = sourceRules.find(targetRule.getRenamePath());
-        System.out.println(sourceRule);
+        List sourceItems = (List) readProperty(sourceRoot, sourceRule);
+        List targetList = new ArrayList();
+        writeProperty(targetRoot, targetRule, targetList);
+        for (Object sourceItem : sourceItems) {
+            if (TypeSupports.isBasicType(sourceItem.getClass())) {
+                targetList.add(sourceItem);
+            } else {
+
+                ToConvert convert = new ToConvert(sourceItem, (Class) targetRule.getGenericTypes()[0]);
+                targetList.add(convert.doConvert());
+            }
+
+        }
+    }
+
+    private void copyBasic(Object sourceRoot, Rules sourceRules, T targetRoot, Rule targetRule) {
+        Rule sourceRule = sourceRules.find(targetRule.getRenamePath());
         Object property = readProperty(sourceRoot, sourceRule);
-        System.out.println(property);
+        if (property == null) {
+            return;
+        }
         writeProperty(targetRoot, targetRule, property);
     }
+
     private Object readProperty(Object root, Rule sourceRule) {
 
         Object property = root;
@@ -76,6 +104,7 @@ public class ToConvert<T> {
 
     Object readSubProperty(Object parent, String name) {
         try {
+
             Field field = parent.getClass().getDeclaredField(name);
             field.setAccessible(true);
             return field.get(parent);
