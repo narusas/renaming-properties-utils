@@ -257,5 +257,32 @@ public class FromConvertTest {
         assertEquals("CD", serviceReq.codes[1].code);
         assertEquals(2, serviceReq.codes[1].no);
     }
+
+    @AllArgsConstructor
+    public static class WebRequest9 {
+        @Rename("names")
+        String name1;
+        @Rename("names")
+        String name2;
+        @Rename("names")
+        String name3;
+
+    }
+
+    public static class ServiceRequest9 {
+        List<String> names;
+    }
+
+    @Test
+    void 리스트로_수집() {
+        WebRequest9 webReq = new WebRequest9("John", "Micheal","Kale");
+        FromConvert<ServiceRequest9> convert = new FromConvert<>(webReq, ServiceRequest9.class);
+        ServiceRequest9 serviceReq = convert.doConvert();
+        assertEquals(3, serviceReq.names.size());
+        assertEquals("John", serviceReq.names.get(0));
+        assertEquals("Micheal", serviceReq.names.get(1));
+        assertEquals("Kale", serviceReq.names.get(2));
+
+    }
 }
 

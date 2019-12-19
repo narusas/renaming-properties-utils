@@ -332,4 +332,30 @@ public class ToConvertTest {
         ToConvert<T> convert = new ToConvert<>(source, target);
         return convert.doConvert();
     }
+
+
+    @AllArgsConstructor
+    public static class ServiceResponse10 {
+        String name1;
+        String name2;
+        String name3;
+    }
+
+    public static class WebResponse9 {
+        @Rename(collect="name")
+        List<String> names;
+    }
+
+    @Test
+    void 리스트로_수집() {
+        ServiceResponse10 webReq = new ServiceResponse10("John", "Micheal","Kale");
+        ToConvert<WebResponse9> convert = new ToConvert<>(webReq, WebResponse9.class);
+        WebResponse9 serviceReq = convert.doConvert();
+        assertEquals(3, serviceReq.names.size());
+        assertEquals("John", serviceReq.names.get(0));
+        assertEquals("Micheal", serviceReq.names.get(1));
+        assertEquals("Kale", serviceReq.names.get(2));
+
+    }
+
 }

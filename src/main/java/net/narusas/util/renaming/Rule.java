@@ -117,4 +117,13 @@ public class Rule {
     }
 
 
+    public boolean isCollecting() {
+        Rename renameTag = field.getDeclaredAnnotation(Rename.class);
+        return renameTag != null && "".equals(renameTag.collect()) == false;
+    }
+
+    public String getCollecting() {
+        Rename renameTag = field.getDeclaredAnnotation(Rename.class);
+        return renameTag == null ? null : renameTag.collect();
+    }
 }

@@ -149,7 +149,20 @@ public class TypeSupports {
 
             Field field = holder.getClass().getDeclaredField(path);
             field.setAccessible(true);
-            field.set(holder, TypeSupports.typeMatch(field.getType(), property));
+
+
+            Object storedValue = field.get(holder);
+            Object newValue = TypeSupports.typeMatch(field.getType(), property);
+            if (isCollectionType(field.getType()) && isCollectionType(newValue.getClass()) == false) {
+                if (storedValue == null) {
+                    storedValue = createCollection(field.getType());
+                    field.set(holder, storedValue);
+                }
+                        
+                ((Collection) storedValue).add(newValue);
+            } else {
+                field.set(holder, newValue);
+            }
 
 
         } catch (Exception ex) {
@@ -219,7 +232,7 @@ public class TypeSupports {
         TypeSupports.writeProperty(targetRoot, targetRule, property);
     }
 
-    static  <T> void coypyArray(Object sourceRoot, Rule sourceRule, T targetRoot, Rule targetRule) {
+    static <T> void coypyArray(Object sourceRoot, Rule sourceRule, T targetRoot, Rule targetRule) {
 
         Object arrayObj = TypeSupports.readProperty(sourceRoot, sourceRule);
         Class<?> componentType = arrayObj.getClass().getComponentType();

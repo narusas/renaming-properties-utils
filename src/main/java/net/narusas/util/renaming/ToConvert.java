@@ -1,5 +1,7 @@
 package net.narusas.util.renaming;
 
+import jdk.internal.org.objectweb.asm.Type;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -74,22 +76,26 @@ public class ToConvert<T> {
     }
 
     private void copyCollection(Object sourceRoot, Rule sourceRule, T targetRoot, Rule targetRule) {
-
-
-        Collection sourceItems = (Collection) TypeSupports.readProperty(sourceRoot, sourceRule);
-        Collection targetList = TypeSupports.createCollection(targetRule.getType());
-        TypeSupports.writeProperty(targetRoot, targetRule, targetList);
-
-        for (Object sourceItem : sourceItems) {
-            if (TypeSupports.isBasicType(sourceItem.getClass())) {
-                targetList.add(sourceItem);
-            } else {
-
-                ToConvert convert = new ToConvert(sourceItem, (Class) targetRule.getGenericTypes()[0]);
-                targetList.add(convert.doConvert());
+        Object sourceProperty = TypeSupports.readProperty(sourceRoot, sourceRule);
+        if (targetRule.isCollecting() == false) {
+            Collection sourceItems = (Collection) sourceProperty;
+            Collection targetList = TypeSupports.createCollection(targetRule.getType());
+            TypeSupports.writeProperty(targetRoot, targetRule, targetList);
+            for (Object sourceItem : sourceItems) {
+                if (TypeSupports.isBasicType(sourceItem.getClass())) {
+                    targetList.add(sourceItem);
+                } else {
+                    ToConvert convert = new ToConvert(sourceItem, (Class) targetRule.getGenericTypes()[0]);
+                    targetList.add(convert.doConvert());
+                }
             }
-
+        } else {
+            if (sourceRule.getPath().startsWith(targetRule.getCollecting())){
+                TypeSupports.writeProperty(targetRoot, targetRule, sourceProperty);
+            }
         }
+
+
     }
 
 
