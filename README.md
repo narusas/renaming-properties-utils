@@ -212,13 +212,15 @@ public class RenamingPropertyUtilsFromTest {
 * From Copy: 복사 룰이 Left 객체에 있을때
 * To Copy:  복사 룰이 Right 객체이 있을때
 * 깊은 중첩 객체의 값을 낮은 곳으로 정리하기
+* ArrayList 말고 지정된 Collection으로 컬렉션 생성
 
 ## Todo
  
 * BigDecimal, BigInteger, AtomicInteger등 추가 타입 
-* Array, Map 지원
+* Array지원 
+* Map 지원
 * String to Enum, Enum To String , int to enum, enum to int 지원
-* ArrayList 말고 지정된 Collection으로 컬렉션 생성
+
 * 여러 변수를 하나의 목록으로 변환. (form에서 phone1, phone2, phone3 등 여러 이름으로 받아서 List<String> phone에 넣을수 있는 기능 `@Rename(value="phone", collect=true)` 정도가 될듯)
 * 목록을 복수의 변수명으로 풀기. 위 기능의 반대. `@Rename(value="phone", split=true)`  . phone으로 시작하는 변수명을 정렬하여 순서대로 넣기. 
 * 상대 경로 지원 
@@ -238,5 +240,6 @@ public void doSometing(WebReq1 req){
     ServiceRequest serviceReq  = req.as; 
 }
 ```
+* 수 -> String 변환시 Formatter 지원
 * .... Too many 
 

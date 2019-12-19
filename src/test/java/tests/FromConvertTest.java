@@ -148,5 +148,114 @@ public class FromConvertTest {
         assertEquals("CD002", b.cd.get(1));
 
     }
+
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class WebReq6A {
+        @Rename("nm")
+        String name;
+
+        @Rename("cd")
+        List<WebReq6ACode> codes;
+    }
+
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class WebReq6ACode {
+        String code;
+        String no;
+    }
+
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ServiceReq6A {
+        String nm;
+        List<ServiceReq6B> cd;
+    }
+
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ServiceReq6B {
+        String code;
+        int no;
+    }
+
+    @Test
+    void ListOfObject() {
+        WebReq6A webReq = new WebReq6A("John", Arrays.asList(new WebReq6ACode("CD", "1"), new WebReq6ACode("CD", "2")));
+        FromConvert<ServiceReq6A> convert = new FromConvert<>(webReq, ServiceReq6A.class);
+        ServiceReq6A serviceReq = convert.doConvert();
+        assertEquals("John", serviceReq.nm);
+        assertEquals(2, serviceReq.cd.size());
+        assertEquals("CD", serviceReq.cd.get(0).code);
+        assertEquals(1, serviceReq.cd.get(0).no);
+        assertEquals("CD", serviceReq.cd.get(1).code);
+        assertEquals(2, serviceReq.cd.get(1).no);
+
+    }
+
+    @AllArgsConstructor
+    public static class WebReq7 {
+        String name;
+        String[] codes;
+    }
+
+    @NoArgsConstructor
+    public static class ServiceReq7 {
+        String name;
+        String[] codes;
+    }
+
+    @Test
+    void 문자열배열() {
+        WebReq7 webReq = new WebReq7("John", new String[]{"CD001", "CD002"});
+
+        FromConvert<ServiceReq7> convert = new FromConvert<>(webReq, ServiceReq7.class);
+        ServiceReq7 serviceReq = convert.doConvert();
+        assertEquals("John", serviceReq.name);
+        assertEquals(2, serviceReq.codes.length);
+        assertEquals("CD001", serviceReq.codes[0]);
+        assertEquals("CD002", serviceReq.codes[1]);
+
+    }
+
+    @AllArgsConstructor
+    public static class WebReq8 {
+        String name;
+        WebReq8Code[] codes;
+    }
+
+    @AllArgsConstructor
+    public static class WebReq8Code {
+        String code;
+        String no;
+    }
+
+    @NoArgsConstructor
+    public static class ServiceReq8 {
+        String name;
+        ServiceReq8Code[] codes;
+    }
+
+    @NoArgsConstructor
+    public static class ServiceReq8Code {
+        String code;
+        int no;
+    }
+
+
+    @Test
+    void 객체배열() {
+        WebReq8 webReq = new WebReq8("John", new WebReq8Code[]{new WebReq8Code("CD", "1"), new WebReq8Code("CD", "2")});
+        FromConvert<ServiceReq8> convert = new FromConvert<>(webReq, ServiceReq8.class);
+        ServiceReq8 serviceReq = convert.doConvert();
+
+        assertEquals("John", serviceReq.name);
+        assertEquals(2, serviceReq.codes.length);
+        assertEquals("CD", serviceReq.codes[0].code);
+        assertEquals(1, serviceReq.codes[0].no);
+        assertEquals("CD", serviceReq.codes[1].code);
+        assertEquals(2, serviceReq.codes[1].no);
+    }
 }
 

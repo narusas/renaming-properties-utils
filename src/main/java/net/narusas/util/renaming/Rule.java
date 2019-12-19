@@ -104,7 +104,7 @@ public class Rule {
         return isCollectionType() || isMapType() || isArrayType();
     }
 
-    private boolean isArrayType() {
+    boolean isArrayType() {
         return field.getType().isArray();
     }
 

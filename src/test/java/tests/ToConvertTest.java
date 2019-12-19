@@ -4,6 +4,7 @@ package tests;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.narusas.util.renaming.FromConvert;
 import net.narusas.util.renaming.Rename;
 import net.narusas.util.renaming.ToConvert;
 import org.junit.jupiter.api.Test;
@@ -253,7 +254,7 @@ public class ToConvertTest {
                 new ServiceRes7Code("CD001", "SUB01")
                 , new ServiceRes7Code("CD002", "SUB02")
         ));
-        WebRes7 webRes  = new ToConvert<>(serviceRes, WebRes7.class).doConvert();
+        WebRes7 webRes = new ToConvert<>(serviceRes, WebRes7.class).doConvert();
         assertEquals("John", webRes.nm);
         assertEquals(2, webRes.cds.size());
         assertEquals("CD001", webRes.cds.get(0).cd1);
@@ -264,4 +265,71 @@ public class ToConvertTest {
     }
 
 
+    @AllArgsConstructor
+    public static class ServiceRes8 {
+        String name;
+        String[] codes;
+    }
+
+    @NoArgsConstructor
+    public static class WebRes8 {
+        String name;
+        String[] codes;
+    }
+
+    @Test
+    void 문자열배열() {
+        ServiceRes8 servieRes = new ServiceRes8("John", new String[]{"CD001", "CD002"});
+
+        ToConvert<WebRes8> convert = new ToConvert<>(servieRes, WebRes8.class);
+        WebRes8 webRes = convert.doConvert();
+        assertEquals("John", webRes.name);
+        assertEquals(2, webRes.codes.length);
+        assertEquals("CD001", webRes.codes[0]);
+        assertEquals("CD002", webRes.codes[1]);
+
+    }
+
+    @AllArgsConstructor
+    public static class ServiceRes9 {
+        String name;
+        ServiceRes9Code[] codes;
+    }
+
+    @AllArgsConstructor
+    public static class ServiceRes9Code {
+        String code;
+        int no;
+    }
+
+    @NoArgsConstructor
+    public static class WebRes9 {
+        String name;
+        WebRes9Code[] codes;
+    }
+
+    @NoArgsConstructor
+    public static class WebRes9Code {
+        String code;
+        String no;
+    }
+
+
+    @Test
+    void 객체배열() {
+        ServiceRes9 serviceRes = new ServiceRes9("John", new ServiceRes9Code[]{new ServiceRes9Code("CD", 1), new ServiceRes9Code("CD", 2)});
+        WebRes9 webRes = convert(serviceRes, WebRes9.class);
+        assertEquals("John", webRes.name);
+        assertEquals("CD", webRes.codes[0].code);
+        assertEquals("1", webRes.codes[0].no, "int to string");
+        assertEquals("CD", webRes.codes[1].code);
+        assertEquals("2", webRes.codes[1].no, "int to string");
+
+    }
+
+
+    <T> T convert(Object source, Class<T> target) {
+        ToConvert<T> convert = new ToConvert<>(source, target);
+        return convert.doConvert();
+    }
 }
