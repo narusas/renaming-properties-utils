@@ -4,8 +4,8 @@ package tests;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.narusas.util.Rename;
-import net.narusas.util.ToConvert;
+import net.narusas.util.renaming.Rename;
+import net.narusas.util.renaming.ToConvert;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;

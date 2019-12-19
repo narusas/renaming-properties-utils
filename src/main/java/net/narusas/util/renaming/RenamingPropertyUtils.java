@@ -1,4 +1,4 @@
-package net.narusas.util;
+package net.narusas.util.renaming;
 
 public class RenamingPropertyUtils {
 

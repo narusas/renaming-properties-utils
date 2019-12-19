@@ -1,4 +1,4 @@
-package net.narusas.util;
+package net.narusas.util.renaming;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

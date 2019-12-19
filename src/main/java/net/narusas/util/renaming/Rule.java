@@ -1,4 +1,4 @@
-package net.narusas.util;
+package net.narusas.util.renaming;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

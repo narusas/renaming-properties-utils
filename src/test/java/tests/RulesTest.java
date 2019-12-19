@@ -1,7 +1,7 @@
 package tests;
 
-import net.narusas.util.Rename;
-import net.narusas.util.Rules;
+import net.narusas.util.renaming.Rename;
+import net.narusas.util.renaming.Rules;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;

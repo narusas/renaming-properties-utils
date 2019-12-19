@@ -1,4 +1,4 @@
-package net.narusas.util;
+package net.narusas.util.renaming;
 
 interface RuleWalker {
     void walk(Rule rule);

@@ -1,4 +1,4 @@
-package net.narusas.util;
+package net.narusas.util.renaming;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
