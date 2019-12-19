@@ -213,11 +213,12 @@ public class RenamingPropertyUtilsFromTest {
 * To Copy:  복사 룰이 Right 객체이 있을때
 * 깊은 중첩 객체의 값을 낮은 곳으로 정리하기
 * ArrayList 말고 지정된 Collection으로 컬렉션 생성
+* Array지원 
+
 
 ## Todo
  
 * BigDecimal, BigInteger, AtomicInteger등 추가 타입 
-* Array지원 
 * Map 지원
 * String to Enum, Enum To String , int to enum, enum to int 지원
 

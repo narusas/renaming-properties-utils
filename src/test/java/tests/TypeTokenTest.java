@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TypeTokenTest {
 
+
     @Test
     public void 필드로_선언된_리스트의_제네릭_타입구하기() throws NoSuchFieldException {
         Class<A> aClass = A.class;
