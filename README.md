@@ -2,16 +2,20 @@
 
 ***주의: 이 문서는 현재 작성중입니다***
 
-개발중에 웹 요청을 서비스 요청으로 변환하거나  서비스 응답을 웹 요청으로 변환하는 것은 매우 지루한 작업이다. 
-그 지루함 때문에  개발자들은 종종 서비스 요청/응답을 위한  DTO를 웹 요청/응답을 위해 사용하려는 유혹에 쉽게 빠지게 된다. 
-이런 유혹에 빠지면 얼마 지난지 않아 웹 계층의 요구사항이 서비스 계층 DTO에 스며들고 곧 거대한 진흙 뭉텅이 DTO로 커지게 된다. (https://thedomaindrivendesign.io/big-ball-of-mud/)
+개발중에 웹 요청을 서비스 요청으로 변환하거나  서비스 응답을 웹 요청으로 변환하는 것은 매우 지루한 작업입니다.
 
-이 프로젝트는 이런 지루함 때문에 발생하는 이슈를 해결해 보고자 객체 복사 과정에 서로 다른 타입이나 구조로 객체를 복사할수 있는 유틸을 제공한다. 
+그 지루함 때문에 개발자들은 종종 서비스 요청/응답을 위한 DTO를 웹 요청/응답을 위해 사용하려는 유혹에 쉽게 빠지게 되죠.
+ 
 
-이 프로젝트에서는 다음과 같은 개발 관례를 추천한다. 
+이런 유혹에 빠지면 얼마 지난지 않아 웹 계층의 요구사항이 서비스 계층 DTO에 스며들고 곧 거대한 진흙 뭉텅이 DTO로 커지게 됩니다. (https://thedomaindrivendesign.io/big-ball-of-mud/)
 
-1. 각 웹 요청별로 전용 웹 요청 클래스를 사용하여 요청별 규약을 정의한다. 
-2. 마찬가지로 응답 역시 웹 전용 응답 클래스를 사용하여 복잡한 도메인 구조가 아닌, 웹에 맞게 설계된 응답 규약을 정의한다. 
+이 프로젝트는 이런 지루함 때문에 발생하는 이슈를 해결해 보고자 객체 복사 과정에 서로 다른 타입이나 구조로 객체를 복사할수 있는 유틸을 제공합니다. 
+ 
+이 프로젝트에서는 다음과 같은 개발 관례를 추천합니다. 
+
+1. 각 웹 요청별로 전용 웹 요청 클래스를 정의합니다. 이 클래스에 요청과 관련된 스펙을 기술합니다.   
+2. 마찬가지로 응답 역시 웹 전용 응답 클래스를 사용하여 복잡한 도메인 구조가 아닌, 웹에 맞게 설계된 응답 규약을 정의합니다. 
+3. 이 요청/응답 전용 DTO 클래스를 컨트롤러의 요청 처리 메소드 위에 정적 클래스로 선언하여 응집성을 높입니다.  
 
 
 Example
@@ -46,14 +50,21 @@ public class ExampleController {
 }
 ```
 
+Note: 별도의 프로젝트로 제공되는 spring 지원기능에 제공되는 `@RenameFrom` 을 이용해 사전이 이미 변경된 객체를 주입받아 사용할수 있습니다.  
 
 
+## 사용방법
 
-사용예
+이 유틸리티는 두개의 변환 메소드를 제공합니다. 각각의 메소드는 재활용되는 서비스쪽에는 어떤 요구사항을 넣지 않고 각 개별 웹 요청/응답 클래스에만 변환 규칙을 넣어서 사용할수 있게 하였습니다. 
+ 
+
+* `from` : 변환 규칙이 source 객체이 있는 변환 메소드. 웹 요청이 source이고 서비스요청으로 변환할때 사용합니다. 
+* `to` 변환 규칙이 target 객체에 있는 변환 메소드. 서비스 응답이 source이고 웹 응답으로 변환할때 사용합니다 .
+
+### `from`
+
+#### 기초적인 변환 
 ```
-
-public class RenamingPropertyUtilsFromTest {
-
     @NoArgsConstructor
     @AllArgsConstructor
     public static class WebReq1A {
@@ -77,7 +88,10 @@ public class RenamingPropertyUtilsFromTest {
         assertEquals("John", b.name);
         assertEquals("01099999999", b.phone);
     }
+```
 
+#### 일부_단순변환룰_일부필드_다른_이름일때
+```
     @NoArgsConstructor
     @AllArgsConstructor
     public static class WebReq2 {
@@ -94,7 +108,10 @@ public class RenamingPropertyUtilsFromTest {
         assertEquals("John", a.name, "rename 규칙이 있기 때문에 nm -> name으로 전환");
         assertNull(a.phone, "동일한 필드명도 없고 rename 규칙이 없기 때문에 전환되지 말아야함");
     }
+```
 
+#### 단순변환룰
+```
     @NoArgsConstructor
     @AllArgsConstructor
     public static class WebReq3 {
@@ -113,7 +130,10 @@ public class RenamingPropertyUtilsFromTest {
         assertEquals("John", a.name, "rename 규칙이 있기 때문에 nm -> name으로 전환");
         assertEquals("01099999999", a.phone, "rename 규칙이 있기 때문에 nm -> name으로 전환");
     }
+```
 
+#### 동일필드명_다른_타입
+```
     @NoArgsConstructor
     @AllArgsConstructor
     public static class WebReq4 {
@@ -128,7 +148,10 @@ public class RenamingPropertyUtilsFromTest {
         assertEquals("John", e.name);
         assertEquals(Integer.parseInt("1099999999"), e.phone);
     }
+```
 
+#### 중첩객체
+```
     @NoArgsConstructor
     @AllArgsConstructor
     public static class WebReqA {
@@ -162,7 +185,10 @@ public class RenamingPropertyUtilsFromTest {
         assertEquals("01099999999", b.c.phone);
 
     }
+```
 
+#### 깊은중첩객체
+```
 
     @NoArgsConstructor
     @AllArgsConstructor
@@ -203,6 +229,10 @@ public class RenamingPropertyUtilsFromTest {
         assertEquals("01099999999", b.c.d.phone);
 
     }
+```
+
+#### 복합객체에서_복합객체로
+```
 
     @AllArgsConstructor
     public static class WebReq3A {
@@ -252,6 +282,7 @@ public class RenamingPropertyUtilsFromTest {
 ```
 
 추가적인  사용법은 `FromConvertTest.java`, `ToConvertTest.java` 를 참조
+
 
 ## Done
 * From Copy: 복사 룰이 Left 객체에 있을때
