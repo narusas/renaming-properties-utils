@@ -284,5 +284,32 @@ public class FromConvertTest {
         assertEquals("Kale", serviceReq.names.get(2));
 
     }
+
+    @AllArgsConstructor
+    public static class WebRequest10 {
+        @Rename(unpack="/name")
+        List<String> names;
+
+
+    }
+
+    public static class ServiceRequest10 {
+
+        String name1;
+        String name2;
+        String name3;
+    }
+
+    @Test
+    void 리스트에서_unpack() {
+        WebRequest10 webReq = new WebRequest10(Arrays.asList("John", "Micheal","Kale"));
+        FromConvert<ServiceRequest10> convert = new FromConvert<>(webReq, ServiceRequest10.class);
+        ServiceRequest10 serviceReq = convert.doConvert();
+
+        assertEquals("John", serviceReq.name1);
+        assertEquals("Micheal", serviceReq.name2);
+        assertEquals("Kale", serviceReq.name3);
+
+    }
 }
 

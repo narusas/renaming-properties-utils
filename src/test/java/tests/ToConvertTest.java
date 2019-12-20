@@ -4,7 +4,6 @@ package tests;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.narusas.util.renaming.FromConvert;
 import net.narusas.util.renaming.Rename;
 import net.narusas.util.renaming.ToConvert;
 import org.junit.jupiter.api.Test;
@@ -342,20 +341,46 @@ public class ToConvertTest {
     }
 
     public static class WebResponse9 {
-        @Rename(collect="name")
+        @Rename(pack = "/name")
         List<String> names;
     }
 
     @Test
-    void 리스트로_수집() {
-        ServiceResponse10 webReq = new ServiceResponse10("John", "Micheal","Kale");
-        ToConvert<WebResponse9> convert = new ToConvert<>(webReq, WebResponse9.class);
-        WebResponse9 serviceReq = convert.doConvert();
-        assertEquals(3, serviceReq.names.size());
-        assertEquals("John", serviceReq.names.get(0));
-        assertEquals("Micheal", serviceReq.names.get(1));
-        assertEquals("Kale", serviceReq.names.get(2));
+    void 리스트로_pack() {
+        ServiceResponse10 serviceRes = new ServiceResponse10("John", "Micheal", "Kale");
+        ToConvert<WebResponse9> convert = new ToConvert<>(serviceRes, WebResponse9.class);
+        WebResponse9 webRes = convert.doConvert();
+        assertEquals(3, webRes.names.size());
+        assertEquals("John", webRes.names.get(0));
+        assertEquals("Micheal", webRes.names.get(1));
+        assertEquals("Kale", webRes.names.get(2));
 
     }
 
+    @AllArgsConstructor
+    public static class ServiceResponse11 {
+
+        List<String> names;
+
+    }
+
+    public static class WebResponse11 {
+        @Rename(unpack = "/names")
+        String name1;
+        @Rename(unpack = "/names")
+        String name2;
+        @Rename(unpack = "/names")
+        String name3;
+    }
+
+    @Test
+    void 리스트에서_unpack() {
+        ServiceResponse11 serviceRes = new ServiceResponse11(Arrays.asList("John", "Micheal", "Kale"));
+        ToConvert<WebResponse11> convert = new ToConvert<>(serviceRes, WebResponse11.class);
+        WebResponse11 webRes = convert.doConvert();
+        assertEquals("John", webRes.name1);
+        assertEquals("Micheal", webRes.name2);
+        assertEquals("Kale", webRes.name3);
+
+    }
 }

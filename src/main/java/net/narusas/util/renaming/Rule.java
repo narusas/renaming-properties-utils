@@ -27,6 +27,18 @@ public class Rule {
     String[] renamePathTokens;
     String rename;
 
+    @Getter
+    boolean isPacking;
+    @Getter
+    String packingPrefix;
+
+    @Getter
+    boolean isUnpacking;
+    @Getter
+    String unpackingPrefix;
+
+    Integer unpackIndex;
+
     List<Rule> childs = new ArrayList<>();
     private Type[] types;
 
@@ -34,12 +46,22 @@ public class Rule {
 
         this.ruleClass = ruleClass;
         this.field = field;
+        this.field.setAccessible(true);
         this.parentPath = parentPath;
         this.parentPathTokens = parentPath.split("/");
         this.name = name;
         this.renamePath = renamePath;
         this.renamePathTokens = renamePath.split("/");
         this.rename = rename;
+
+        Rename renameTag = field.getDeclaredAnnotation(Rename.class);
+
+        this.isPacking = renameTag != null && Rename.PACK_NOT_EXIST.equals(renameTag.pack()) == false;
+        this.packingPrefix = isPacking ? renameTag.pack() : null;
+
+        this.isUnpacking = renameTag != null && Rename.PACK_NOT_EXIST.equals(renameTag.unpack()) == false;
+        this.unpackingPrefix = isUnpacking ? renameTag.unpack() : null;
+
 
         parseGenericType();
     }
@@ -117,13 +139,23 @@ public class Rule {
     }
 
 
-    public boolean isCollecting() {
-        Rename renameTag = field.getDeclaredAnnotation(Rename.class);
-        return renameTag != null && "".equals(renameTag.collect()) == false;
+    public <T> Object getValue(T targetRoot) {
+        try {
+            return field.get(targetRoot);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public String getCollecting() {
-        Rename renameTag = field.getDeclaredAnnotation(Rename.class);
-        return renameTag == null ? null : renameTag.collect();
+    public <T> void setValue(T targetRoot, Object newValue) {
+        try {
+            field.set(targetRoot, newValue);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Integer unpackIndex() {
+        return unpackIndex;
     }
 }

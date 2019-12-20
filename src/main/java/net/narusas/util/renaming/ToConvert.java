@@ -1,10 +1,6 @@
 package net.narusas.util.renaming;
 
-import jdk.internal.org.objectweb.asm.Type;
-
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -41,20 +37,21 @@ public class ToConvert<T> {
              * rule은 정렬 되어 있고 다른 문자열로 시작하는 것이 나오기 전까지만 비교하면 됨
              */
             for (Rule targetRule : targetRules) {
-                Rule sourceRule = sourceRules.find(targetRule.getRenamePath());
+
+
                 if (targetRule.isCollectionType()) {
                     previous = targetRule.getPath();
-                    copyCollection(source, sourceRule, targetRoot, targetRule);
+                    copyCollection(source, sourceRules, targetRoot, targetRule, targetRules);
                 } else if (targetRule.isArrayType()) {
                     previous = targetRule.getPath();
-                    coypyArray(source, sourceRule, targetRoot, targetRule);
+                    coypyArray(source, sourceRules, targetRoot, targetRule);
                 } else if (TypeSupports.isBasicType(targetRule.getType()) == false) {
                     // 객체는 basci property에서 채워짐
                 } else {
                     if (previous != null && targetRule.getPath().startsWith(previous)) {
                         continue;
                     }
-                    copyBasic(source, sourceRule, targetRoot, targetRule);
+                    copyBasic(source, sourceRules, targetRoot, targetRule);
                 }
             }
             return targetRoot;
@@ -63,21 +60,49 @@ public class ToConvert<T> {
         }
     }
 
-    private void coypyArray(Object source, Rule sourceRule, T targetRoot, Rule targetRule) {
-
+    private void coypyArray(Object source, Rules sourceRules, T targetRoot, Rule targetRule) {
+        Rule sourceRule = sourceRules.find(targetRule.getRenamePath());
         TypeSupports.coypyArray(source, sourceRule, targetRoot, targetRule);
     }
 
 
-    private void copyBasic(Object sourceRoot, Rule sourceRule, T targetRoot, Rule targetRule) {
+    private void copyBasic(Object sourceRoot, Rules sourceRules, T targetRoot, Rule targetRule) {
+        if (targetRule.isUnpacking()) {
+            // 소스에서 컬렉션 객체 하나를 읽어 오는것임
+            Rule sourceRule = sourceRules.find(targetRule.getUnpackingPrefix());
+            List sourceProperty = (List) TypeSupports.readProperty(sourceRoot, sourceRule);
 
-        TypeSupports.copyBasic(sourceRoot, sourceRule, targetRoot, targetRule);
+
+            int index = targetRules.unpackIndex(targetRule);
+            targetRule.setValue(targetRoot, sourceProperty.get(index));
+
+        }
+        else {
+            Rule sourceRule = sourceRules.find(targetRule.getRenamePath());
+            TypeSupports.copyBasic(sourceRoot, sourceRule, targetRoot, targetRule);
+
+        }
 
     }
 
-    private void copyCollection(Object sourceRoot, Rule sourceRule, T targetRoot, Rule targetRule) {
-        Object sourceProperty = TypeSupports.readProperty(sourceRoot, sourceRule);
-        if (targetRule.isCollecting() == false) {
+    private void copyCollection(Object sourceRoot, Rules sourceRules, T targetRoot, Rule targetRule, Rules targetRules) {
+
+        if (targetRule.isPacking()) {
+            Rules collectingSourceRules = sourceRules.startsWith(targetRule.getPackingPrefix());
+            for (Rule sourceRule : collectingSourceRules) {
+                Object sourceProperty = TypeSupports.readProperty(sourceRoot, sourceRule);
+                Collection storedValue = (Collection) targetRule.getValue(targetRoot);
+                if (storedValue == null) {
+                    storedValue = TypeSupports.createCollection((Class) targetRule.getGenericTypes()[0]);
+                    targetRule.setValue(targetRoot, storedValue);
+                }
+                storedValue.add(sourceProperty);
+            }
+
+        } else {
+
+            Rule sourceRule = sourceRules.find(targetRule.getRenamePath());
+            Object sourceProperty = TypeSupports.readProperty(sourceRoot, sourceRule);
             Collection sourceItems = (Collection) sourceProperty;
             Collection targetList = TypeSupports.createCollection(targetRule.getType());
             TypeSupports.writeProperty(targetRoot, targetRule, targetList);
@@ -89,11 +114,17 @@ public class ToConvert<T> {
                     targetList.add(convert.doConvert());
                 }
             }
-        } else {
-            if (sourceRule.getPath().startsWith(targetRule.getCollecting())){
-                TypeSupports.writeProperty(targetRoot, targetRule, sourceProperty);
-            }
+
         }
+
+
+//
+//
+//        } else {
+//            if (sourceRule.getPath().startsWith(targetRule.getCollecting())){
+//                TypeSupports.writeProperty(targetRoot, targetRule, sourceProperty);
+//            }
+//        }
 
 
     }

@@ -12,5 +12,11 @@ public @interface Rename {
      */
     boolean flatten() default false;
 
-    String collect() default "__NOT_COLLECTING__";
+    String pack() default PACK_NOT_EXIST;
+
+    final static String PACK_NOT_EXIST = "__NOT_PACKING__";
+
+    String unpack() default PACK_NOT_EXIST;
+
+
 }
