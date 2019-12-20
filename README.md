@@ -1,8 +1,53 @@
 # Renaming Properties Utils
 
-웹요청 DTO을 서비스 요청 DTO 로 변환하거나, 서비스 응답 DTO를 웹 응답 DTO로 변환하는 것은 매우 지겨운 작업이다. 
+***주의: 이 문서는 현재 작성중입니다***
 
-이 작업을 어느정도 수월하게 수행하기 위해 속성 복사중 이름/경로 변경을 지원하는 유틸이다 
+개발중에 웹 요청을 서비스 요청으로 변환하거나  서비스 응답을 웹 요청으로 변환하는 것은 매우 지루한 작업이다. 
+그 지루함 때문에  개발자들은 종종 서비스 요청/응답을 위한  DTO를 웹 요청/응답을 위해 사용하려는 유혹에 쉽게 빠지게 된다. 
+이런 유혹에 빠지면 얼마 지난지 않아 웹 계층의 요구사항이 서비스 계층 DTO에 스며들고 곧 거대한 진흙 뭉텅이 DTO로 커지게 된다. (https://thedomaindrivendesign.io/big-ball-of-mud/)
+
+이 프로젝트는 이런 지루함 때문에 발생하는 이슈를 해결해 보고자 객체 복사 과정에 서로 다른 타입이나 구조로 객체를 복사할수 있는 유틸을 제공한다. 
+
+이 프로젝트에서는 다음과 같은 개발 관례를 추천한다. 
+
+1. 각 웹 요청별로 전용 웹 요청 클래스를 사용하여 요청별 규약을 정의한다. 
+2. 마찬가지로 응답 역시 웹 전용 응답 클래스를 사용하여 복잡한 도메인 구조가 아닌, 웹에 맞게 설계된 응답 규약을 정의한다. 
+
+
+Example
+```
+@Controller
+public class ExampleController {
+
+    @RenameFrom("as") 
+    public static class UpdatePersonalInfoRequest {
+        @Rename("personalInfo/familyName") @NotEmpty            String familyName;
+        @Rename("personalInfo/name") @NotEmpty                  String name;
+        @Rename("personalInfo/gender") @NotEmpty                String gender;
+
+        @Rename("addressInfo/country")                          String addr1;
+        @Rename("addressInfo/city")                             String addr2;
+        @Rename("addressInfo/etc")                              String addr3;
+
+        PersonalInfo as;
+    }
+
+    public static class UpdatePersonalInfoResponse {
+        boolean isUpdated;
+        String[] modifiedKeys;
+    }
+
+
+    @RequestMapping(value="/me", methods=POSTs) 
+    public UpdatePersonalInfoResponse updatePersonalInfo(@Valid WebRequest1 req) {
+        ServiceCallResult serviceResult = req.as;
+        return RenamingPropertyUtils.to(serviceResult, UpdatePersonalInfoResponse.class);
+     }   
+}
+```
+
+
+
 
 사용예
 ```
@@ -206,7 +251,7 @@ public class RenamingPropertyUtilsFromTest {
 }
 ```
 
-기본적인 사용법은 `RenamingPropertyUtilsFromTest.java` 를 참조
+추가적인  사용법은 `FromConvertTest.java`, `ToConvertTest.java` 를 참조
 
 ## Done
 * From Copy: 복사 룰이 Left 객체에 있을때
