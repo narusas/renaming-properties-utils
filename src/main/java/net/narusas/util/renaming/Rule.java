@@ -27,14 +27,11 @@ public class Rule {
     String[] renamePathTokens;
     String rename;
 
-    @Getter
+
     boolean isPacking;
-    @Getter
     String packingPrefix;
 
-    @Getter
     boolean isUnpacking;
-    @Getter
     String unpackingPrefix;
 
     Integer unpackIndex;

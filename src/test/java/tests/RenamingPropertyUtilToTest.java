@@ -10,14 +10,14 @@ import static org.junit.Assert.assertEquals;
 
 public class RenamingPropertyUtilToTest {
     @AllArgsConstructor
-    static class ServiceResult1 {
+    public static class ServiceResult1 {
         String name;
         String phone;
         String dummy;
     }
 
     @NoArgsConstructor
-    static class WebResponse1 {
+    public static class WebResponse1 {
         String name;
         String phone;
     }
@@ -31,7 +31,7 @@ public class RenamingPropertyUtilToTest {
     }
 
     @NoArgsConstructor
-    static class WebResponse2 {
+    public static class WebResponse2 {
         String name;
 
         @Rename("phone")
@@ -48,7 +48,7 @@ public class RenamingPropertyUtilToTest {
     }
 
     @NoArgsConstructor
-    static class WebResponse3 {
+    public static class WebResponse3 {
         @Rename("name")
         String nm;
 
@@ -65,18 +65,18 @@ public class RenamingPropertyUtilToTest {
     }
 
     @AllArgsConstructor
-    static class ServiceResponse4A {
+    public static class ServiceResponse4A {
         String name;
         ServiceResponse4B b;
     }
 
     @AllArgsConstructor
-    static class ServiceResponse4B {
+    public static class ServiceResponse4B {
         String phone;
     }
 
 
-    static class WebResponse4 {
+    public static class WebResponse4 {
         String name;
 
         @Rename("b/phone")
@@ -93,23 +93,23 @@ public class RenamingPropertyUtilToTest {
     }
 
     @AllArgsConstructor
-    static class ServiceResponse5A {
+    public static class ServiceResponse5A {
         String name;
         ServiceResponse5B b;
     }
 
     @AllArgsConstructor
-    static class ServiceResponse5B {
+    public static class ServiceResponse5B {
         ServiceResponse5C c;
     }
 
     @AllArgsConstructor
-    static class ServiceResponse5C {
+    public static class ServiceResponse5C {
         String phone;
     }
 
 
-    static class WebResponse5 {
+    public static class WebResponse5 {
         String name;
 
         @Rename("b/c/phone")

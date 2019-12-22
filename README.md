@@ -5,21 +5,21 @@
 개발중에 웹 요청을 서비스 요청으로 변환하거나  서비스 응답을 웹 요청으로 변환하는 것은 매우 지루한 작업입니다.
 
 그 지루함 때문에 개발자들은 종종 서비스 요청/응답을 위한 DTO를 웹 요청/응답을 위해 사용하려는 유혹에 쉽게 빠지게 되죠.
- 
 
-이런 유혹에 빠지면 얼마 지난지 않아 웹 계층의 요구사항이 서비스 계층 DTO에 스며들고 곧 거대한 진흙 뭉텅이 DTO로 커지게 됩니다. (https://thedomaindrivendesign.io/big-ball-of-mud/)
+이런 유혹에 빠지면 얼마 지나지 않아 웹 계층의 요구사항이 서비스 계층 DTO에 스며들고 곧 거대한 진흙 뭉텅이 DTO로 커지게 됩니다. (https://thedomaindrivendesign.io/big-ball-of-mud/)
 
 이 프로젝트는 이런 지루함 때문에 발생하는 이슈를 해결해 보고자 객체 복사 과정에 서로 다른 타입이나 구조로 객체를 복사할수 있는 유틸을 제공합니다. 
  
 이 프로젝트에서는 다음과 같은 개발 관례를 추천합니다. 
 
-1. 각 웹 요청별로 전용 웹 요청 클래스를 정의합니다. 이 클래스에 요청과 관련된 스펙을 기술합니다.   
-2. 마찬가지로 응답 역시 웹 전용 응답 클래스를 사용하여 복잡한 도메인 구조가 아닌, 웹에 맞게 설계된 응답 규약을 정의합니다. 
+1. 각 웹 요청별로 전용 웹 요청 클래스를 정의합니다. 이 클래스에 요청과 관련된 스펙을 기술합니다.  웹의 Form 형태에 맞춰 가급적 Flat 한 구조를 가지는게 좋습니다. 
+2. 마찬가지로 응답 역시 웹 전용 응답 클래스를 사용하여 복잡한 도메인 구조가 아닌, 웹에 맞게 설계된 응답 규약을 정의합니다. 서비스의 응답이 복잡한 구조를 가질수 있지만 이를 웹에 표시할때는 가급적 flat한 구조로 바꿔서 제공하세요. 또한 불필요한 정보가 누설되지 않게 화면에 필요한 정보만 포함하는게 좋습니다.  
 3. 이 요청/응답 전용 DTO 클래스를 컨트롤러의 요청 처리 메소드 위에 정적 클래스로 선언하여 응집성을 높입니다.  
 
 
 Example
 ```
+import static net.narusas.util.renaming.RenamingPropertyUtils.*;
 @Controller
 public class ExampleController {
 
@@ -45,7 +45,7 @@ public class ExampleController {
     @RequestMapping(value="/me", methods=POSTs) 
     public UpdatePersonalInfoResponse updatePersonalInfo(@Valid WebRequest1 req) {
         ServiceCallResult serviceResult = req.as;
-        return RenamingPropertyUtils.to(serviceResult, UpdatePersonalInfoResponse.class);
+        return to(serviceResult, UpdatePersonalInfoResponse.class);
      }   
 }
 ```

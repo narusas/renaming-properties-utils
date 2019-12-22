@@ -20,40 +20,48 @@ public class FromConvert<T> {
     private final Rules sourceRules;
     private final Class<T> targetClass;
     private final Rules targetRules;
+    T targetRoot;
+    String previous = null;
 
     public FromConvert(Object source, Class<T> targetClass) {
         this.sourceRoot = source;
         this.sourceRules = Rules.of(source.getClass());
         this.targetClass = targetClass;
         this.targetRules = Rules.of(targetClass);
+        this.targetRoot = newInstance();
     }
 
     public T doConvert() {
-        try {
-
-            T targetRoot = targetClass.newInstance();
-            String previous = null;
-            for (Rule sourceRule : sourceRules) {
-                if (sourceRule.isCollectionType()) {
-                    previous = sourceRule.getPath();
-                    coypyCollection(sourceRoot, sourceRule, targetRoot, targetRules);
-                } else if (sourceRule.isArrayType()) {
-                    previous = sourceRule.getPath();
-                    coypyArray(sourceRoot, sourceRule, targetRoot, targetRules);
-                } else if (TypeSupports.isBasicType(sourceRule.field.getType()) == false) {
-                    // fill paths   과정에서 채워짐
-                } else {
-                    if (previous != null && sourceRule.getPath().startsWith(previous)) {
-                        continue;
-                    }
-                    copyBasic(sourceRoot, sourceRule, targetRoot, targetRules);
+        for (Rule sourceRule : sourceRules) {
+            if (sourceRule.isCollectionType()) {
+                coypyCollection(sourceRoot, sourceRule, targetRoot, targetRules);
+            } else if (sourceRule.isArrayType()) {
+                coypyArray(sourceRoot, sourceRule, targetRoot, targetRules);
+            } else if (TypeSupports.isBasicType(sourceRule.field.getType()) == false) {
+                // 컬렉션도 아니고 기본 타입도 아닌 객체는, 하위 구조의 기본 타입을 채우는 fill paths 과정에서 채워짐
+            } else {
+                if (isChildOfCollection(sourceRule)) {
+                    continue;
                 }
+                copyBasic(sourceRoot, sourceRule, targetRoot, targetRules);
+            }
+        }
+        return targetRoot;
+    }
+
+    private boolean isChildOfCollection(Rule sourceRule) {
+        return previous != null && sourceRule.getPath().startsWith(previous);
+    }
+
+    private T newInstance() {
+        try {
+            for (Constructor c : targetClass.getDeclaredConstructors()) {
+                c.setAccessible(true);
             }
 
-
-            return targetRoot;
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            return targetClass.newInstance();
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
         }
     }
 
@@ -68,45 +76,47 @@ public class FromConvert<T> {
     }
 
     private <T> void coypyCollection(Object sourceRoot, Rule sourceRule, T targetRoot, Rules targetRules) {
-
+        previous = sourceRule.getPath();
         if (sourceRule.isUnpacking()) {
-            List sourceItems = (List) TypeSupports.readProperty(sourceRoot, sourceRule);
-
-            Rules unpackingTargetRules = targetRules.startsWith(sourceRule.getUnpackingPrefix());
-            for (int i = 0; i < unpackingTargetRules.size(); i++) {
-                Rule unpackTarget = unpackingTargetRules.get(i);
-                TypeSupports.writeProperty(targetRoot, unpackTarget, sourceItems.get(i));
-            }
-
-
+            copyUnpacking(sourceRoot, sourceRule, targetRoot, targetRules);
         } else {
-            Rule targetRule = targetRules.find(sourceRule.getRenamePath());
-            Collection sourceItems = (Collection) TypeSupports.readProperty(sourceRoot, sourceRule);
-            Collection targetList = TypeSupports.createCollection(targetRule.getType());
-            TypeSupports.writeProperty(targetRoot, targetRule, targetList);
-
-            for (Object sourceItem : sourceItems) {
-                if (TypeSupports.isBasicType(sourceItem.getClass())) {
-                    targetList.add(sourceItem);
-                } else {
-                    FromConvert convert = new FromConvert(sourceItem, (Class) targetRule.getGenericTypes()[0]);
-                    targetList.add(convert.doConvert());
-                }
-
-            }
+            copyNormalCollection(sourceRoot, sourceRule, targetRoot, targetRules);
         }
+    }
 
+    private <T> void copyNormalCollection(Object sourceRoot, Rule sourceRule, T targetRoot, Rules targetRules) {
+        Rule targetRule = targetRules.find(sourceRule.getRenamePath());
+        Collection sourceItems = (Collection) TypeSupports.readProperty(sourceRoot, sourceRule);
+        Collection targetList = TypeSupports.createCollection(targetRule.getType());
+        TypeSupports.writeProperty(targetRoot, targetRule, targetList);
 
+        for (Object sourceItem : sourceItems) {
+            if (TypeSupports.isBasicType(sourceItem.getClass())) {
+                targetList.add(sourceItem);
+            } else {
+                FromConvert convert = new FromConvert(sourceItem, (Class) targetRule.getGenericTypes()[0]);
+                targetList.add(convert.doConvert());
+            }
+
+        }
+    }
+
+    private <T> void copyUnpacking(Object sourceRoot, Rule sourceRule, T targetRoot, Rules targetRules) {
+        List sourceItems = (List) TypeSupports.readProperty(sourceRoot, sourceRule);
+
+        Rules unpackingTargetRules = targetRules.startsWith(sourceRule.getUnpackingPrefix());
+        for (int i = 0; i < unpackingTargetRules.size(); i++) {
+            Rule unpackTarget = unpackingTargetRules.get(i);
+            TypeSupports.writeProperty(targetRoot, unpackTarget, sourceItems.get(i));
+        }
     }
 
     private void coypyArray(Object sourceRoot, Rule sourceRule, T targetRoot, Rules targetRules) {
+        previous = sourceRule.getPath();
         Rule targetRule = targetRules.find(sourceRule.getRenamePath());
         if (targetRule == null) {
             return;
         }
         TypeSupports.coypyArray(sourceRoot, sourceRule, targetRoot, targetRule);
-
     }
-
-
 }

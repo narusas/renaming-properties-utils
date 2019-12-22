@@ -76,7 +76,7 @@ class RulesFactory {
             adjustRenamePath();
 
             if (isBasicType()) {
-                rules.add(new Rule( ruleClass, field, parentPath, field.getName(), currentRenamePath, rename));
+                rules.add(new Rule(ruleClass, field, parentPath, field.getName(), currentRenamePath, rename));
             } else if (collectionType()) {
                 handleCollection();
             } else {
@@ -86,6 +86,22 @@ class RulesFactory {
                 }
                 adjustFlatRenamePath();
                 parse(nextParentRule, currentPath, currentRenamePath, field.getType(), rules);
+            }
+        }
+
+        private void adjustRenamePath() {
+
+            if (rename.startsWith("/")) {
+                currentRenamePath = rename.substring(0, rename.lastIndexOf("/"));
+                rename = rename.substring(rename.lastIndexOf("/"));
+            }
+
+        }
+
+        private void adjustFlatRenamePath() {
+            currentRenamePath = currentRenamePath + rename + "/";
+            if (currentRenamePath.startsWith("//")) {
+                currentRenamePath = currentRenamePath.substring(1);
             }
         }
 
@@ -113,7 +129,7 @@ class RulesFactory {
         class CollectionParser {
 
             public void process() {
-                nextParentRule = new Rule( ruleClass, field, parentPath, field.getName(), currentRenamePath, rename);
+                nextParentRule = new Rule(ruleClass, field, parentPath, field.getName(), currentRenamePath, rename);
                 rules.add(nextParentRule);
                 adjustFlatRenamePath();
 
@@ -149,22 +165,6 @@ class RulesFactory {
             }
         }
 
-
-        private void adjustFlatRenamePath() {
-            currentRenamePath = currentRenamePath + rename + "/";
-            if (currentRenamePath.startsWith("//")) {
-                currentRenamePath = currentRenamePath.substring(1);
-            }
-        }
-
-        private void adjustRenamePath() {
-
-            if (rename.startsWith("/")) {
-                currentRenamePath = rename.substring(0, rename.lastIndexOf("/"));
-                rename = rename.substring(rename.lastIndexOf("/"));
-            }
-
-        }
 
         protected String currentRenamePath() {
             if (rename.startsWith("/")) {
@@ -218,11 +218,7 @@ class RulesFactory {
 
                             || Character.class.equals(targetType)
                             || char.class.equals(targetType)
-
                     ;
         }
-
     }
-
-
 }
